@@ -1,12 +1,18 @@
 {
   "name": "langgraph-tut",
   "version": "1.0.0",
-  "description": "langraph",
+  "description": "Quiz Agent with A2A and MCP protocol support",
   "main": "server.js",
   "scripts": {
     "dev": "ts-node-dev server.ts",
-    "start:dev" : "bun run --watch server.ts",
-    "build" : "tsc"
+    "start:dev": "bun run --watch server.ts",
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "mcp-server": "ts-node scripts/mcp-server.ts",
+    "a2a-demo": "ts-node scripts/a2a-demo.ts",
+    "test:protocols": "ts-node scripts/test-protocols.ts",
+    "test:api": "node scripts/test-api.js",
+    "protocols:init": "PROTOCOLS_AUTO_INIT=true ts-node -e \"import('./protocols/protocolManager').then(m => m.protocolManager.initialize())\""
   },
   "author": "Rohan Balami",
   "license": "MIT",
@@ -16,16 +22,20 @@
     "@langchain/langgraph": "^0.4.9",
     "@langchain/openai": "^0.6.11",
     "@langchain/tavily": "^0.1.5",
+    "@modelcontextprotocol/sdk": "^1.18.0",
+    "@types/ws": "^8.18.1",
     "cheerio": "^1.1.2",
     "dotenv": "^17.2.2",
     "express": "^5.1.0",
     "p-limit": "^7.1.1",
     "uuid": "^13.0.0",
+    "ws": "^8.18.3",
     "zod": "^3.24.1"
   },
   "devDependencies": {
     "@types/express": "^5.0.3",
     "@types/node": "^24.3.3",
+    "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.9.2"
   },
