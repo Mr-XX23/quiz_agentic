@@ -1,0 +1,37 @@
+{
+  "name": "langgraph-tut",
+  "version": "1.0.0",
+  "description": "langraph",
+  "main": "server.js",
+  "scripts": {
+    "dev": "ts-node-dev server.ts",
+    "start:dev" : "bun run --watch server.ts",
+    "build" : "tsc"
+  },
+  "author": "Rohan Balami",
+  "license": "MIT",
+  "dependencies": {
+    "@langchain/community": "^0.3.56",
+    "@langchain/core": "^0.3.75",
+    "@langchain/langgraph": "^0.4.9",
+    "@langchain/openai": "^0.6.11",
+    "@langchain/tavily": "^0.1.5",
+    "cheerio": "^1.1.2",
+    "dotenv": "^17.2.2",
+    "express": "^5.1.0",
+    "p-limit": "^7.1.1",
+    "uuid": "^13.0.0",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.3",
+    "@types/node": "^24.3.3",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.9.2"
+  },
+  "overrides": {
+    "@browserbasehq/stagehand": {
+      "dotenv": "17.2.2"
+    }
+  }
+}
