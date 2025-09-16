@@ -1,0 +1,208 @@
+{
+  "name": "Quiz Generation Agent",
+  "description": "An AI agent that generates exactly 20 multiple-choice quiz questions on any topic, with web research capabilities for specialized subjects.",
+  "version": "1.0.0",
+  "protocolVersion": "1.0",
+  "author": "Rohan Balami",
+  "license": "MIT",
+  "capabilities": [
+    "quiz.generate",
+    "quiz.generate_with_research", 
+    "web.search",
+    "web.batch_extract_content"
+  ],
+  "serviceEndpoint": "/api/a2a/service",
+  "serviceEndpoints": {
+    "quiz.generate": "/api/a2a/quiz/generate",
+    "quiz.generate_with_research": "/api/a2a/quiz/generate-with-research",
+    "web.search": "/api/a2a/web/search",
+    "web.batch_extract_content": "/api/a2a/web/batch-extract"
+  },
+  "methods": [
+    {
+      "name": "quiz.generate",
+      "description": "Generate exactly 20 multiple-choice quiz questions on a given topic",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "topic": {
+            "type": "string",
+            "description": "The topic for the quiz questions"
+          },
+          "difficulty": {
+            "type": "string",
+            "enum": ["easy", "medium", "hard"],
+            "default": "medium",
+            "description": "Difficulty level of the questions"
+          },
+          "researchContent": {
+            "type": "string",
+            "description": "Optional research content to base questions on",
+            "optional": true
+          }
+        },
+        "required": ["topic"]
+      },
+      "returns": {
+        "type": "object",
+        "properties": {
+          "total_questions": {
+            "type": "number",
+            "description": "Total number of questions (always 20)"
+          },
+          "quiz_questions": {
+            "type": "array",
+            "description": "Array of quiz question objects",
+            "items": {
+              "type": "object",
+              "properties": {
+                "question": {
+                  "type": "string",
+                  "description": "The question text"
+                },
+                "correct_answer": {
+                  "type": "string",
+                  "description": "The correct answer (A, B, C, D, or E)"
+                },
+                "answers": {
+                  "type": "array",
+                  "description": "Array of 5 answer choices",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "answer": {
+                        "type": "string",
+                        "description": "Answer option with letter prefix (e.g., 'A. Option text')"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "quiz.generate_with_research",
+      "description": "Generate quiz questions with automatic web research for specialized topics",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "topic": {
+            "type": "string",
+            "description": "The topic for the quiz questions"
+          },
+          "maxResults": {
+            "type": "number",
+            "default": 5,
+            "description": "Maximum number of web search results to research"
+          }
+        },
+        "required": ["topic"]
+      },
+      "returns": {
+        "type": "object",
+        "description": "Same as quiz.generate with research metadata",
+        "properties": {
+          "total_questions": {
+            "type": "number"
+          },
+          "quiz_questions": {
+            "type": "array"
+          },
+          "research_sources": {
+            "type": "array",
+            "description": "URLs of sources used in research",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "web.search",
+      "description": "Search the web for relevant information on a topic",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "description": "Search query"
+          },
+          "maxResults": {
+            "type": "number",
+            "default": 5,
+            "description": "Maximum number of results to return"
+          }
+        },
+        "required": ["query"]
+      },
+      "returns": {
+        "type": "object",
+        "properties": {
+          "results": {
+            "type": "array",
+            "description": "Search results with URLs and snippets"
+          }
+        }
+      }
+    },
+    {
+      "name": "web.batch_extract_content",
+      "description": "Extract content from multiple URLs concurrently",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "urls": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Array of URLs to extract content from"
+          },
+          "maxContentLength": {
+            "type": "number",
+            "default": 8000,
+            "description": "Maximum content length per URL"
+          }
+        },
+        "required": ["urls"]
+      },
+      "returns": {
+        "type": "object",
+        "properties": {
+          "combinedContent": {
+            "type": "string",
+            "description": "Combined extracted content from all URLs"
+          },
+          "successfulUrls": {
+            "type": "array",
+            "description": "URLs that were successfully processed"
+          },
+          "failedUrls": {
+            "type": "array",
+            "description": "URLs that failed to process with error details"
+          }
+        }
+      }
+    }
+  ],
+  "metadata": {
+    "tags": ["quiz", "education", "ai", "langgraph", "research"],
+    "category": "education",
+    "supportedLanguages": ["en"],
+    "rateLimit": {
+      "requests": 100,
+      "window": "1h"
+    },
+    "maxConcurrentRequests": 10
+  },
+  "health": {
+    "endpoint": "/health",
+    "status": "operational"
+  },
+  "documentation": "https://github.com/Mr-XX23/quiz_agentic/blob/main/README.md",
+  "repository": "https://github.com/Mr-XX23/quiz_agentic"
+}

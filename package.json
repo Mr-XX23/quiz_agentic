@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "ts-node-dev server.ts",
     "start:dev" : "bun run --watch server.ts",
-    "build" : "tsc"
+    "build" : "tsc",
+    "test:a2a": "node test-a2a.js",
+    "start": "node dist/server.js"
   },
   "author": "Rohan Balami",
   "license": "MIT",

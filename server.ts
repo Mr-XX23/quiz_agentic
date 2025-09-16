@@ -2,15 +2,34 @@
 import express from "express";
 import bodyParser from "body-parser";
 import dotenv from "dotenv";
+import path from "path";
 
 // local imports
 import { runAgent } from "./agentController/agent";
+import quizRouter from "./routes";
 
 dotenv.config();
 
 const app = express();
 app.use(bodyParser.json());
 
+// Serve static files for A2A discovery (agent.json)
+app.use('/.well-known', express.static(path.join(__dirname, '.well-known')));
+
+// A2A routes
+app.use("/api", quizRouter);
+
+// Health check endpoint
+app.get("/health", (req, res) => {
+  res.json({ 
+    status: "operational", 
+    timestamp: new Date().toISOString(),
+    version: "1.0.0",
+    agent: "Quiz Generation Agent"
+  });
+});
+
+// Original main endpoint (for backward compatibility)
 app.use("/", async (req, res, next) => {
 
   const { prompt } = req.body;
@@ -42,7 +61,7 @@ app.use("/", async (req, res, next) => {
   }
 });
 
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Quiz agent API listening on http://localhost:${PORT}`);
 });

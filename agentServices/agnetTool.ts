@@ -7,6 +7,9 @@ import { runQuizAgentGraph } from "./tools/quizGenerateTool/generateQuiz";
 import { batchWebContentExtractorController } from "./tools/webSearchTool/batchWebContentExtractor"
 import { travilyWebSearchTool } from "./tools/webSearchTool/webSearchTool"
 
+// A2A communication tools
+import { a2aTools } from "./tools/a2aCommunication";
+
 // TOOL 1 : A tool to generate quiz
 const generateQuizTool = tool(
     async ({ prompt, researchContent }: { prompt: string; researchContent?: string }) => {
@@ -75,8 +78,14 @@ const directUrlBatchExtractor = tool(
     }
 );
 
-// single export for all tools
-const tools = [generateQuizTool, batchWebContentExtractor, directUrlBatchExtractor, webSearchTool];
+// Combine all tools including A2A communication tools
+const tools = [
+    generateQuizTool, 
+    batchWebContentExtractor, 
+    directUrlBatchExtractor, 
+    webSearchTool,
+    ...a2aTools  // Add A2A communication capabilities
+];
 
 // export tools by name for easy access
 const toolbyName = Object.fromEntries(
