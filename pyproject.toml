@@ -1,0 +1,70 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "quiz-agentic"
+version = "0.1.0"
+description = "A lightweight Quiz Agent built with LangGraph and LangChain tools with A2A and MCP protocol support"
+readme = "README.md"
+requires-python = ">=3.9"
+authors = [
+    {name = "Quiz Agentic Team"}
+]
+keywords = ["quiz", "agent", "langgraph", "langchain", "a2a", "mcp"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+
+dependencies = [
+    "langchain>=0.1.0",
+    "langchain-openai>=0.1.0",
+    "langchain-community>=0.1.0",
+    "langgraph>=0.1.0",
+    "pydantic>=2.0.0",
+    "httpx>=0.25.0",
+    "beautifulsoup4>=4.12.0",
+    "python-dotenv>=1.0.0",
+    "jsonschema>=4.19.0",
+    "tavily-python>=0.3.0",
+    "mcp>=1.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-asyncio>=0.21.0",
+    "black>=23.0.0",
+    "isort>=5.12.0",
+    "mypy>=1.5.0",
+    "pre-commit>=3.0.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/Mr-XX23/quiz_agentic"
+Repository = "https://github.com/Mr-XX23/quiz_agentic"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["quiz_agentic*"]
+
+[tool.black]
+line-length = 88
+target-version = ['py39']
+
+[tool.isort]
+profile = "black"
+line_length = 88
+
+[tool.mypy]
+python_version = "3.9"
+strict = true
+warn_return_any = true
+warn_unused_configs = true
