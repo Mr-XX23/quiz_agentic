@@ -10,6 +10,8 @@
     "start": "node dist/server.js",
     "mcp-server": "ts-node scripts/mcp-server.ts",
     "a2a-demo": "ts-node scripts/a2a-demo.ts",
+    "test:protocols": "ts-node scripts/test-protocols.ts",
+    "test:api": "node scripts/test-api.js",
     "protocols:init": "PROTOCOLS_AUTO_INIT=true ts-node -e \"import('./protocols/protocolManager').then(m => m.protocolManager.initialize())\""
   },
   "author": "Rohan Balami",
