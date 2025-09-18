@@ -17,7 +17,7 @@ const MAIN_SYSTEM_PROMPT = `
 You are a quiz assistant that creates exactly 20 questions.
 MAIN WORKFLOW WITH CONCURRENT WEB RESEARCH:
 
-FOR WELL-KNOWN TOPICS (EXAMPLES: basic math, history, common science, geography, etc.):
+FOR WELL-KNOWN TOPICS (EXAMPLES: basic math, history, common science, geography, the knowledge that you have already like research papers, your own trained data and data already have  etc.):
 
    - Call generate_quiz directly with the topic prompt
    -Discriptions = 1. When requests a quiz, call the generate_quiz tool with their topic, 
