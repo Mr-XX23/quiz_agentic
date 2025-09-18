@@ -9,15 +9,42 @@ import { travilyWebSearchTool } from "./tools/webSearchTool/webSearchTool"
 
 // TOOL 1 : A tool to generate quiz
 const generateQuizTool = tool(
-    async ({ prompt, researchContent }: { prompt: string; researchContent?: string }) => {
-        let enhancedPrompt = prompt;
-        if (researchContent && researchContent.trim().length > 0) {
-            enhancedPrompt = `Create a quiz about: ${prompt} RESEARCH CONTENT TO BASE QUESTIONS ON:
-            ${researchContent}
-            Use this research content to create accurate, detailed quiz questions. Focus on key facts, concepts, and information from the provided content.`;
+    async ({ prompt, researchContent, targetCount = 20 }: { prompt: string; researchContent?: string, targetCount: number }) => {
+
+        try {
+            let enhancedPrompt = prompt;
+
+            if (researchContent && researchContent.trim().length > 0) {
+                enhancedPrompt = `Create a quiz about: ${prompt}
+                    RESEARCH CONTENT TO BASE QUESTIONS ON:
+                        ${researchContent}
+                        Use this research content to create accurate, detailed quiz questions. Focus on key facts, concepts, and information from the provided content.`;
+            }
+
+            // Use enhanced quiz generation with options
+            const quiz = await runQuizAgentGraph(enhancedPrompt, {
+                targetCount,
+                maxAttempts: 4
+            });
+
+            return {
+                success: true,
+                quiz,
+                message: `Successfully generated ${targetCount} quiz questions`,
+                targetCount
+            };
+
+        } catch (error: any) {
+            // Return structured error that LLM can understand and act upon
+            return {
+                success: false,
+                error: error.message,
+                targetCount,
+                suggestion: error.message.includes('Max attempts')
+                    ? 'Try a simpler topic or break down the request into smaller parts'
+                    : 'Check if the topic has sufficient available information for quiz creation'
+            };
         }
-        const quiz = await runQuizAgentGraph(enhancedPrompt);
-        return quiz;
     },
     {
         name: "generate_quiz",
