@@ -1,138 +1,218 @@
-<<<<<<< HEAD
+# Quiz Agent with A2A and MCP Protocol Support
 
-# LangGraph Quiz Agent
+A LangGraph-powered quiz generation agent with advanced protocol support for distributed execution and external system integration.
 
-A lightweight Quiz Agent built with LangGraph and LangChain tools. This project demonstrates a small service that generates exactly 20 multiple-choice quiz questions for a given topic. It uses a combination of a reactive agent graph, web search and batch content extraction tools, and JSON schema validation to produce robust, validated quiz output.
+## 🚀 New Protocol Features
 
-## Key features
+### Model Context Protocol (MCP) Support
+- **MCP Server**: Expose Quiz Agent tools via Anthropic's Model Context Protocol
+- **MCP Client**: Connect to external MCP servers for enhanced capabilities
+- **Tool Integration**: Seamless tool calling across systems
+- **Resource Access**: Read data from external sources
 
-- Generate exactly 20 multiple-choice questions (5 options each: A-E).
-- Automatic web research for specialized topics via the `web_search` tool.
-- Concurrent batch extraction of web content (3-5 URLs concurrently) for fast research with `batch_web_content_extractor`.
-- Internal stateful generation with retries to ensure exactly 20 validated questions.
-- Final structured JSON validated against a Zod schema (`schemas/quizSchema.ts`).
-- Tool-oriented architecture using `@langchain/langgraph` prebuilt agents and tool wrappers.
+### Agent-to-Agent (A2A) Communication
+- **Distributed Execution**: Load balancing across multiple agent instances
+- **WebSocket Communication**: Real-time agent networking
+- **Task Coordination**: Intelligent routing and task distribution
+- **Performance Monitoring**: Agent health and performance tracking
 
-## Project structure (important files)
+### Protocol-Aware Routing
+- **Intelligent Selection**: Automatic protocol selection based on capabilities
+- **Fallback Handling**: Graceful degradation between protocols
+- **Unified API**: Single endpoint supporting all protocols
 
-- `server.ts` — Minimal Express server that accepts a JSON body with `prompt` and runs the main agent.
-- `routes.ts` — Router stubs for quiz endpoints (`POST /quiz`, `GET /quiz/stream`).
-- `agentController/agent.ts` — Creates and runs the main LangGraph agent. Defines the system prompt and orchestrates tools.
-- `agentController/agentController.ts` — Express controller functions that expose quiz generation endpoints.
-- `agentServices/agnetTool.ts` — Tool registry that defines `generate_quiz`, `web_search`, `batch_web_content_extractor`, and `extract_multiple_urls` tools.
-- `agentServices/tools/quizGenerateTool/` — The quiz generation graph and structuring helpers (`generateQuiz.ts`, `structuredResponse.ts`).
-- `agentServices/tools/webSearchTool/` — Web search and batch content extraction helpers (`webSearchTool.ts`, `batchWebContentExtractor.ts`).
-- `schemas/quizSchema.ts` — Zod schema for validating the final quiz JSON.
+## 📡 API Endpoints
 
-## How it works (high level)
+### Core Endpoints
+- `POST /` - Direct quiz generation (original)
+- `POST /quiz` - Controller-based generation  
+- `GET /quiz/stream` - Streaming generation
+- `POST /quiz/protocol` - **NEW** Protocol-aware generation
 
-1. The Express server (`server.ts`) receives a POST request with `{ prompt }`.
-2. `agentController/agent.ts` creates a reactive LangGraph agent with tools and a main system prompt (`MAIN_SYSTEM_PROMPT`).
-3. For well-known topics the agent calls `generate_quiz` directly. For specialized topics, the agent uses `web_search` to fetch URLs, `batch_web_content_extractor` to load content concurrently, then calls `generate_quiz` with research content.
-4. `generate_quiz` (tool) uses a stateful graph (`quizGenerateTool/generateQuiz.ts`) to generate, check, retry, and validate until exactly 20 questions are produced.
-5. `structuredResponse.ts` parses and validates the output JSON against the `QuizSchema` using Zod; it enforces exactly 20 questions.
+### Protocol Management
+- `GET /protocol/status` - **NEW** Overall protocol status
 
-## Endpoints
+### MCP Endpoints
+- `GET /mcp/servers` - **NEW** List connected MCP servers
+- `POST /mcp/tools/:server` - **NEW** List tools on MCP server
+- `POST /mcp/call/:server/:tool` - **NEW** Call MCP tool
 
-- POST / (main server endpoint)
+### A2A Endpoints
+- `GET /a2a/agents` - **NEW** List active agents
+- `GET /a2a/status` - **NEW** Coordinator status
+- `POST /a2a/task` - **NEW** Submit task to agent network
 
-  - Body: { "prompt": "<topic or request>" }
-  - Returns: Validated JSON object matching the schema (only the JSON, no extra text)
+## 🛠 Usage Examples
 
-- (Planned) POST /quiz — implemented in `routes.ts` and served by `agentController/agentController.ts` (currently stubbed)
-- (Planned) GET /quiz/stream — SSE streaming endpoint (stubbed)
+### Protocol-Aware Quiz Generation
+```bash
+curl -X POST http://localhost:3000/quiz/protocol \
+  -H "Content-Type: application/json" \
+  -H "X-Protocol: a2a" \
+  -d '{
+    "method": "generate_quiz",
+    "params": {"prompt": "Machine Learning Fundamentals"},
+    "options": {"priority": 2, "timeout": 45000}
+  }'
+```
 
-## Environment variables
+### MCP Tool Calling
+```bash
+curl -X POST http://localhost:3000/mcp/call/filesystem/read_file \
+  -H "Content-Type: application/json" \
+  -d '{"args": {"path": "/path/to/questions.txt"}}'
+```
 
-- `PORT` — port to run the Express server
-- `OPENAI_API_KEY` — API key for OpenAI models used by the LLM tools
-- `TAVILY_API_KEY` — API key for the Tavily web search provider
+### A2A Task Distribution
+```bash
+curl -X POST http://localhost:3000/a2a/task \
+  -H "Content-Type: application/json" \
+  -d '{
+    "type": "web_search",
+    "params": {"query": "Latest AI research", "maxResults": 5},
+    "priority": 1
+  }'
+```
 
-Create a `.env` file in the project root with values, for example:
+## 🎮 Getting Started
 
-PORT=3000
-OPENAI_API_KEY=sk-...
-
-# quiz_agentic (LangGraph Quiz Agent)
-
-A lightweight Quiz Agent built with LangGraph and LangChain tools. This project demonstrates a small service that generates exactly 20 multiple-choice quiz questions for a given topic. It uses a combination of a reactive agent graph, web search and batch content extraction tools, and JSON schema validation to produce robust, validated quiz output.
-
-## Key features
-
-- Generate exactly 20 multiple-choice questions (5 options each: A-E).
-- Automatic web research for specialized topics via the `web_search` tool.
-- Concurrent batch extraction of web content (3-5 URLs concurrently) for fast research with `batch_web_content_extractor`.
-- Internal stateful generation with retries to ensure exactly 20 validated questions.
-- Final structured JSON validated against a Zod schema (`schemas/quizSchema.ts`).
-- Tool-oriented architecture using `@langchain/langgraph` prebuilt agents and tool wrappers.
-
-## Project structure (important files)
-
-- `server.ts` — Minimal Express server that accepts a JSON body with `prompt` and runs the main agent.
-- `routes.ts` — Router stubs for quiz endpoints (`POST /quiz`, `GET /quiz/stream`).
-- `agentController/agent.ts` — Creates and runs the main LangGraph agent. Defines the system prompt and orchestrates tools.
-- `agentController/agentController.ts` — Express controller functions that expose quiz generation endpoints.
-- `agentServices/agnetTool.ts` — Tool registry that defines `generate_quiz`, `web_search`, `batch_web_content_extractor`, and `extract_multiple_urls` tools.
-- `agentServices/tools/quizGenerateTool/` — The quiz generation graph and structuring helpers (`generateQuiz.ts`, `structuredResponse.ts`).
-- `agentServices/tools/webSearchTool/` — Web search and batch content extraction helpers (`webSearchTool.ts`, `batchWebContentExtractor.ts`).
-- `schemas/quizSchema.ts` — Zod schema for validating the final quiz JSON.
-
-## How it works (high level)
-
-1. The Express server (`server.ts`) receives a POST request with `{ prompt }`.
-2. `agentController/agent.ts` creates a reactive LangGraph agent with tools and a main system prompt (`MAIN_SYSTEM_PROMPT`).
-3. For well-known topics the agent calls `generate_quiz` directly. For specialized topics, the agent uses `web_search` to fetch URLs, `batch_web_content_extractor` to load content concurrently, then calls `generate_quiz` with research content.
-4. `generate_quiz` (tool) uses a stateful graph (`quizGenerateTool/generateQuiz.ts`) to generate, check, retry, and validate until exactly 20 questions are produced.
-5. `structuredResponse.ts` parses and validates the output JSON against the `QuizSchema` using Zod; it enforces exactly 20 questions.
-
-## Endpoints
-
-- POST / (main server endpoint)
-
-  - Body: { "prompt": "<topic or request>" }
-  - Returns: Validated JSON object matching the schema (only the JSON, no extra text)
-
-- (Planned) POST /quiz — implemented in `routes.ts` and served by `agentController/agentController.ts` (currently stubbed)
-- (Planned) GET /quiz/stream — SSE streaming endpoint (stubbed)
-
-## Environment variables
-
-- `PORT` — port to run the Express server
-- `OPENAI_API_KEY` — API key for OpenAI models used by the LLM tools
-- `TAVILY_API_KEY` — API key for the Tavily web search provider
-
-Create a `.env` file in the project root with values, for example:
-
-PORT=3000
-OPENAI_API_KEY=sk-...
-TAVILY_API_KEY=...
-
-## How to run (development)
-
-1. Install dependencies:
-
-```powershell
+### Install Dependencies
+```bash
 npm install
 ```
 
-2. Start in dev mode:
+### Environment Configuration
+Copy `.env.example` to `.env` and configure:
+```bash
+# Basic configuration
+PORT=3000
+OPENAI_API_KEY=your_key_here
+TAVILY_API_KEY=your_key_here
 
-```powershell
+# Protocol configuration
+MCP_ENABLED=true
+A2A_ENABLED=true
+A2A_PORT=8080
+```
+
+### Start the Server
+```bash
 npm run dev
 ```
 
-3. Send a POST request to the server root with JSON `{ "prompt": "Create a quiz about basic algebra" }`.
+### Test Protocol Support
+```bash
+npm run test:api
+```
 
-Notes:
+### Run Protocol Demos
+```bash
+# Start MCP server
+npm run mcp-server
 
-- The server expects the model keys to be configured and accessible to the environment. If you don't have `OPENAI_API_KEY` or `TAVILY_API_KEY` set, parts of the toolchain will fail.
+# Run A2A demo
+npm run a2a-demo
+```
 
-## Developer notes and next steps
+## 📖 Documentation
 
-- The `routes.ts` file wires up quiz endpoints but the main server currently mounts the root path directly to `agentController/agent.runAgent` flow. You may want to replace the root mount with the router in `server.ts` for clarity.
-- Consider adding tests for the structuring logic in `structuredResponse.ts` (happy path + invalid JSON + fewer than 20 questions).
-- Streaming endpoint (`GET /quiz/stream`) is stubbed — implement event streaming from the LangChain agent for real-time progress.
+- [`docs/PROTOCOL_GUIDE.md`](docs/PROTOCOL_GUIDE.md) - Comprehensive protocol usage guide
+- [`docs/DEVELOPER_GUIDE.md`](docs/DEVELOPER_GUIDE.md) - Original developer documentation
 
----
+## 🏗 Architecture
 
-For more detailed, developer-oriented documentation see `docs/DEVELOPER_GUIDE.md`.
+```
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   MCP Clients   │    │   HTTP Clients  │    │   A2A Agents    │
+└─────────┬───────┘    └─────────┬───────┘    └─────────┬───────┘
+          │                      │                      │
+          │                      │                      │
+     ┌────▼──────────────────────▼──────────────────────▼────┐
+     │              Protocol Router                         │
+     │  ┌─────────┐ ┌─────────┐ ┌─────────────────────────┐ │
+     │  │   MCP   │ │ Direct  │ │         A2A             │ │
+     │  │Handler  │ │Handler  │ │     Coordinator         │ │
+     │  └─────────┘ └─────────┘ └─────────────────────────┘ │
+     └─────────────────────┬───────────────────────────────┘
+                           │
+     ┌─────────────────────▼───────────────────────────────┐
+     │              Quiz Agent Core                        │
+     │  ┌─────────────┐ ┌─────────────┐ ┌─────────────┐   │
+     │  │ Quiz        │ │ Web Search  │ │ Content     │   │
+     │  │ Generation  │ │ Tool        │ │ Extraction  │   │
+     │  └─────────────┘ └─────────────┘ └─────────────┘   │
+     └─────────────────────────────────────────────────────┘
+```
+
+## 🔧 Configuration Options
+
+### Protocol Configuration
+- `MCP_ENABLED` - Enable MCP support
+- `MCP_SERVER_ENABLED` - Run as MCP server
+- `A2A_ENABLED` - Enable A2A networking
+- `A2A_PORT` - A2A WebSocket port
+- `A2A_COORDINATOR_ENABLED` - Enable task coordination
+
+### Performance Tuning
+- `DEFAULT_TIMEOUT` - Default request timeout (30000ms)
+- `MAX_CONCURRENT_TASKS` - Max concurrent A2A tasks (5)
+- `AGENT_RETRY_ATTEMPTS` - Retry attempts for failed tasks (3)
+
+## 🧪 Testing
+
+### Unit Tests
+```bash
+npm run test:protocols  # Test protocol implementations
+npm run test:api        # Test API endpoints
+```
+
+### Manual Testing
+```bash
+# Check protocol status
+curl http://localhost:3000/protocol/status
+
+# Test original endpoint (backward compatibility)
+curl -X POST http://localhost:3000/ \
+  -H "Content-Type: application/json" \
+  -d '{"prompt": "Basic algebra"}'
+```
+
+## 🚧 Current Implementation Status
+
+✅ **Completed**
+- MCP server interface (simplified)
+- A2A agent networking with WebSocket
+- Protocol routing and selection
+- API endpoint integration
+- Configuration management
+- Comprehensive documentation
+
+🔄 **Future Enhancements**
+- Full MCP SDK integration when stable
+- Advanced load balancing algorithms
+- Protocol-specific error recovery
+- Performance metrics dashboard
+- Agent discovery mechanisms
+
+## 🤝 Contributing
+
+The protocol implementation provides a foundation for:
+- External system integration via MCP
+- Distributed quiz generation via A2A
+- Extensible tool calling across protocols
+- Scalable agent orchestration
+
+See the [Protocol Guide](docs/PROTOCOL_GUIDE.md) for detailed usage patterns and examples.
+
+## 🎯 Original Features
+
+- Generate exactly 20 multiple-choice questions (5 options each: A-E)
+- Automatic web research for specialized topics
+- Concurrent batch extraction of web content (3-5 URLs concurrently)
+- Internal stateful generation with retries to ensure exactly 20 validated questions
+- Final structured JSON validated against a Zod schema
+- Tool-oriented architecture using `@langchain/langgraph` prebuilt agents
+
+## 📝 License
+
+MIT

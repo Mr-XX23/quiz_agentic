@@ -1,7 +1,7 @@
 {
   "name": "langgraph-tut",
   "version": "1.0.0",
-  "description": "langraph",
+  "description": "Quiz Agent with A2A and MCP protocol support",
   "main": "server.js",
   "scripts": {
     "dev": "ts-node-dev server.ts",
@@ -27,6 +27,7 @@
     "p-limit": "^7.1.1",
     "redis": "^5.8.2",
     "uuid": "^13.0.0",
+    "ws": "^8.18.3",
     "zod": "^3.24.1"
   },
   "devDependencies": {
